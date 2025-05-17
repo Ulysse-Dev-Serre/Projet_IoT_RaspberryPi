@@ -1,25 +1,20 @@
-Adafruit-Blinka==8.56.0
-adafruit-circuitpython-busdevice==5.2.11
-adafruit-circuitpython-connectionmanager==3.1.3
-adafruit-circuitpython-register==1.10.2
-adafruit-circuitpython-requests==4.1.10
-adafruit-circuitpython-scd30==2.2.14
-adafruit-circuitpython-typing==1.11.2
-Adafruit-PlatformDetect==3.77.0
-Adafruit-PureIO==1.1.11
-binho-host-adapter==0.1.6
-blinker==1.9.0
-click==8.1.8
-Flask==3.1.0
-itsdangerous==2.2.0
-Jinja2==3.1.6
-lgpio==0.2.2.0
-MarkupSafe==3.0.2
-pyftdi==0.56.0
-pyserial==3.5
-pyusb==1.3.1
-rpi-ws281x==5.0.0
-RPi.GPIO==0.7.1
-sysv-ipc==1.1.0
-typing_extensions==4.12.2
-Werkzeug==3.1.3
+# Fichier requirements.txt pour le projet Serre Connectée
+
+# Pour l'API Web
+Flask>=2.0.0
+
+# Pour la connexion à la base de données PostgreSQL
+psycopg2-binary>=2.9.0
+
+# Pour l'interface matérielle sur Raspberry Pi
+lgpio>=0.2.0.0         # Pour le contrôle GPIO (remplace RPi.GPIO)
+Adafruit-Blinka>=7.0.0  # Couche de compatibilité CircuitPython pour Raspberry Pi (pour les capteurs I2C/SPI)
+adafruit-circuitpython-scd30>=2.0.0 # Pour le capteur de CO2, température, humidité SCD30
+
+# Pour les tests (optionnel, mais fortement recommandé)
+pytest>=7.0.0           # Framework de test
+pytest-mock>=3.0.0      # Pour faciliter la simulation (mocking) lors des tests
+
+# Autres bibliothèques que vous pourriez ajouter ultérieurement :
+# requests
+# pydantic
