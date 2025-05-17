@@ -1,0 +1,160 @@
+# Fichier .gitignore global pour le projet OvoOx_GreenHouse
+
+# --- Fichiers et dossiers générés par Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environnements virtuels Python
+# Ajoutez ici les noms spécifiques de vos environnements virtuels
+myenv/
+venv/
+env/
+myenv_pi/
+myenv_neuve_serre/
+# Modèles génériques pour les environnements dans les sous-dossiers
+*/myenv/
+*/venv/
+*/env/
+
+# Fichiers de log Python et spécifiques au projet
+*.log
+gestion_serre/serre_controller.log
+
+# Bases de données SQLite locales (si utilisées pour des tests et non versionnées)
+*.sqlite3
+*.db
+# Si vous avez un data.db dans gestion_serre/data/ que vous ne voulez PAS versionner :
+gestion_serre/data/data.db
+
+# Paquets et roues Python
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# Rapports de couverture de tests Python
+.coverage
+coverage.xml
+htmlcov/
+
+# Carnets Jupyter Notebook
+.ipynb_checkpoints
+
+# --- Fichiers et dossiers générés par Java (pour Java_app) ---
+# Dossiers de sortie de compilation
+Java_app/bin/
+Java_app/target/
+# Fichiers de classe compilés
+*.class
+
+# Fichiers JAR générés (si ce sont des artefacts de build et non des bibliothèques à versionner)
+# Si vous avez des .jar qui sont des dépendances que vous voulez inclure,
+# commentez la ligne suivante ou soyez plus spécifique.
+# *.jar
+
+# Fichiers spécifiques aux IDE Java (Eclipse, IntelliJ - souvent couverts par la section IDE plus bas)
+.classpath
+.project
+*.iml
+
+# Fichiers de build Maven/Gradle
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/
+# .gradle/ # Si vous utilisez Gradle
+
+# --- Fichiers et dossiers pour projets Web (Site_web, Mobile_app si basé sur le web) ---
+# Dépendances Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json # Souvent versionné, mais certains préfèrent l'ignorer si package.json suffit
+# yarn.lock # Souvent versionné
+
+# Dossiers de build pour projets web (Angular, React, Vue, etc.)
+dist/
+build/
+.angular/
+.next/
+out/
+
+# --- Fichiers et dossiers pour Machine Learning (machine_learning) ---
+# Gros fichiers de données (à adapter selon vos besoins)
+# *.csv
+# *.pkl
+# *.h5
+# datasets/ # Si vous avez un dossier dédié aux données brutes volumineuses
+
+# --- Fichiers générés par les IDE et éditeurs de texte ---
+# VS Code
+.vscode/*
+!.vscode/settings.json  # Ne pas ignorer si vous partagez des paramètres de projet
+!.vscode/tasks.json     # Ne pas ignorer si vous partagez des tâches de projet
+!.vscode/launch.json    # Ne pas ignorer si vous partagez des configurations de lancement
+!.vscode/extensions.json # Ne pas ignorer si vous recommandez des extensions
+
+# IntelliJ IDEA
+.idea/
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Netbeans
+nbproject/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+
+# --- Fichiers générés par le système d'exploitation ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Fichiers de miniatures et temporaires Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Fichiers temporaires Linux
+*~
+#*#
+.#*
+%.swp
+.directory
+
+# --- Autres ---
+# Fichiers de configuration locaux ou sensibles (ne jamais versionner les secrets !)
+# config_local.py
+# .env # Fichiers d'environnement contenant des secrets
+
+# Captures d'écran (si vous ne voulez pas les versionner)
+# *.png
+# *.jpg
+# *.jpeg
+# *.gif
+# Si "Capture d’écran*.png" est toujours temporaire :
+Capture d'écran*.png
+
+# Fichier SQL (Donnees.sql)
+# Si Donnees.sql est un script de création de schéma que vous voulez versionner,
+# commentez la ligne suivante. Si c'est un dump de données de test/travail, ignorez-le.
+# Donnees.sql
+
+# Fichiers compressés (si ce sont des sauvegardes ou des builds)
+# *.zip
+# *.tar.gz
+# *.rar

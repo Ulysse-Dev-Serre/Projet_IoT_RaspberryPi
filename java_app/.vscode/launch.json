@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "Java_app_1600d737"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "Interface_serre_6f15317c"
+        },
+        {
+            "type": "java",
+            "name": "Launch AppUI",
+            "request": "launch",
+            "mainClass": "AppUI",
+            "vmArgs": "--module-path \"C:\\dev\\javafx-sdk-21.0.6\\lib\" --add-modules javafx.controls,javafx.fxml -Djavafx.verbose=false"
+        }
+    ]
+}

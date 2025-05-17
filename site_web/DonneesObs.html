@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observations Champignons</title>
+    <!-- SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body class="donnees-obs">
+    <div class="container">
+        <header>
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
+                <a class="navbar-brand fw-bold" href="index.html">OvoOx GreenHouse</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+        
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="Connexion.html">Se connecter</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <h1>Observations des Cultures</h1>
+            <nav>
+                <a href="index.html">Retour à l'accueil</a>
+            </nav>
+
+            <!-- =================================================================== -->
+            <div class="page-selector">
+                <select id="pageSelect" onchange="loadPage(this.value)">
+                    <!-- Les options seront générées dynamiquement -->
+                </select>
+                <button onclick="addNewPage()">+ Nouvelle page</button>
+                <button onclick="deleteCurrentPage()">Supprimer page</button>
+            </div>
+            <!-- =================================================================== -->
+
+        </header>
+
+        
+
+        <div class="add-table-controls">
+            <select id="tableType">
+                <option value="">Sélectionner le type de tableau</option>
+                <option value="info-base">🧾 Information de Base</option>
+                <option value="liquid">🧪 Multiplication liquide</option>
+                <option value="grain">🌾 Multiplication en grain</option>
+                <option value="substrate">🍄 Phase : Colonisation du substrat</option>
+                <option value="fruiting">🍄 Phase : Fructification</option>
+            </select>
+            <button onclick="addNewTable()">+ Ajouter un tableau</button>
+        </div>
+
+        <div id="observationTables" class="row">
+            <!-- Les tableaux seront ajoutés ici -->
+        </div>
+    </div>
+
+    <footer>
+        <section id="Contact">
+          <p>Contacts</p>
+          <div class="contact-items">
+            <p>Email : <a href="mailto:tonemail@example.com">tonemail@example.com</a></p>
+            <p>Adresse : 123 rue des Serres</p>
+            <p>Téléphone : (123) 456-7890</p>
+          </div>
+        </section>
+      </footer>
+
+    <script>
+   // Gestion des pages et des données
+let currentPage = 'LM-A1';
+let pages = JSON.parse(localStorage.getItem('pages')) || ['LM-A1'];
+let tableCounter = JSON.parse(localStorage.getItem('tableCounter')) || 0;
+let tablesData = JSON.parse(localStorage.getItem('tablesData')) || { 'LM-A1': [] };
+
+// Sauvegarder les données
+function saveData() {
+    localStorage.setItem('tablesData', JSON.stringify(tablesData));
+    localStorage.setItem('pages', JSON.stringify(pages));
+    localStorage.setItem('tableCounter', JSON.stringify(tableCounter));
+}
+
+// Initialiser la page
+function initializePage() {
+    if (!tablesData[currentPage]) {
+        tablesData[currentPage] = [];
+    }
+    loadTables();
+    updatePageSelect();
+}
+
+// Mettre à jour le menu déroulant des pages
+function updatePageSelect() {
+    const select = document.getElementById('pageSelect');
+    select.innerHTML = '';
+    pages.forEach(page => {
+        const option = document.createElement('option');
+        option.value = page;
+        option.textContent = page;
+        if (page === currentPage) option.selected = true;
+        select.appendChild(option);
+    });
+}
+
+// Charger une page
+function loadPage(page) {
+    if (page) {
+        currentPage = page;
+        initializePage();
+    }
+}
+
+// Ajouter une nouvelle page
+function addNewPage() {
+    const newPage = prompt('Nom de la nouvelle page :', `LM-A${pages.length + 1}`);
+    if (newPage && !pages.includes(newPage)) {
+        pages.push(newPage);
+        tablesData[newPage] = [];
+        currentPage = newPage;
+        saveData();
+        updatePageSelect();
+        loadPage(newPage);
+    } else if (pages.includes(newPage)) {
+        alert('Ce nom de page existe déjà.');
+    }
+}
+
+// Supprimer la page courante
+function deleteCurrentPage() {
+    if (pages.length <= 1) {
+        alert('Vous ne pouvez pas supprimer la dernière page.');
+        return;
+    }
+    if (confirm(`Êtes-vous sûr de vouloir supprimer la page ${currentPage} ?`)) {
+        pages = pages.filter(p => p !== currentPage);
+        delete tablesData[currentPage];
+        currentPage = pages[0];
+        saveData();
+        updatePageSelect();
+        loadPage(currentPage);
+    }
+}
+
+// Charger les tableaux
+function loadTables() {
+    const container = document.getElementById('observationTables');
+    container.innerHTML = '';
+    tablesData[currentPage].forEach(table => {
+        const card = document.createElement('div');
+        card.className = `table-card width-${table.width || '1-1'} ${table.type === 'info-base' ? 'centered' : ''}`;
+        card.id = table.id;
+        card.innerHTML = `
+            <div class="table-header">
+                <h2 contenteditable="true" onblur="updateTableTitle('${table.id}', this.innerText)">${table.title}</h2>
+                <select onchange="updateTableWidth('${table.id}', this.value)">
+                    <option value="1-1" ${table.width === '1-1' ? 'selected' : ''}>1/1 (Pleine largeur)</option>
+                    <option value="1-2" ${table.width === '1-2' ? 'selected' : ''}>1/2 (Moitié)</option>
+                    <option value="1-3" ${table.width === '1-3' ? 'selected' : ''}>1/3 (Tiers)</option>
+                </select>
+            </div>
+            <table id="table-${table.id}">
+                <tbody>
+                    ${table.rows.map(row => `
+                        <tr>
+                            ${row.map((cell, colIndex) => `
+                                <td contenteditable="true" onblur="updateTableCell('${table.id}', this.parentNode.rowIndex, ${colIndex}, this.innerText)">${cell}</td>
+                            `).join('')}
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        container.appendChild(card);
+    });
+
+    // Activer le drag-and-drop
+    new Sortable(container, {
+        animation: 150,
+        onEnd: function (evt) {
+            const newOrder = Array.from(container.children).map(child => {
+                const tableId = child.id;
+                return tablesData[currentPage].find(t => t.id === tableId);
+            });
+            tablesData[currentPage] = newOrder;
+            saveData();
+        }
+    });
+}
+
+// Ajouter un nouveau tableau
+function addNewTable() {
+    const tableType = document.getElementById('tableType').value;
+    if (!tableType) {
+        alert('Veuillez sélectionner un type de tableau.');
+        return;
+    }
+
+    tableCounter++;
+    const tableId = `card-${tableCounter}`;
+    let tableTitle = '';
+    let rows = [];
+    let tableTypeName = tableType;
+
+    switch (tableType) {
+        case 'info-base':
+            tableTitle = '🧾 Information de Base';
+            rows = [
+                ['Souche source', ''],
+                ['Quantité', ''],
+                ['Date de réception', ''],
+                ['Provenance', ''],
+                ['Prix', '']
+            ];
+            break;
+        case 'liquid':
+            tableTitle = '🧪 Multiplication liquide';
+            rows = [
+                ['Nom culture', ''],
+                ['Source de départ', ''],
+                ['Date de démarrage', ''],
+                ['Date de fin (et durée)', ''],
+                ['Volume final obtenu', ''],
+                ['Ingrédients', ''],
+                ['Temps de stérilisation', ''],
+                ['Notes', '']
+            ];
+            break;
+        case 'grain':
+            tableTitle = '🌾 Multiplication en grain';
+            rows = [
+                ['Nom culture', ''],
+                ['Inoculé avec', ''],
+                ['Type de grain', ''],
+                ['Date de démarrage', ''],
+                ['Date de fin (et durée)', ''],
+                ['Quantité grain préparé', ''],
+                ['Temps de stérilisation', ''],
+                ['Notes', '']
+            ];
+            break;
+        case 'substrate':
+            tableTitle = '🍄 Phase : Colonisation du substrat';
+            rows = [
+                ['ID Saque', ''],
+                ['Quantité Substrat', ''],
+                ['Substrat', ''],
+                ['Date démarrage', ''],
+                ['Date de fin (durée)', ''],
+                ['Temps de stérilisation', ''],
+                ['Source de départ', ''],
+                ['Quantité d\'unité', ''],
+                ['Notes', '']
+            ];
+            break;
+        case 'fruiting':
+            tableTitle = '🍄 Phase : Fructification';
+            rows = [
+                ['Notes', '']
+            ];
+            break;
+    }
+
+    const newTable = {
+        id: tableId,
+        title: tableTitle,
+        rows: rows,
+        type: tableTypeName,
+        width: '1-1' // Largeur par défaut
+    };
+
+    tablesData[currentPage].unshift(newTable);
+    saveData();
+    loadTables();
+}
+
+// Mettre à jour la largeur d'un tableau
+function updateTableWidth(tableId, newWidth) {
+    const table = tablesData[currentPage].find(t => t.id === tableId);
+    if (table) {
+        table.width = newWidth;
+        saveData();
+        loadTables();
+    }
+}
+
+// Ajouter une ligne
+function addRow(tableId) {
+    const table = tablesData[currentPage].find(t => t.id === tableId);
+    if (table) {
+        const newRow = Array(table.rows[0].length).fill('');
+        table.rows.push(newRow);
+        saveData();
+        loadTables();
+    }
+}
+
+// Supprimer une ligne
+function deleteRow(tableId, rowIndex) {
+    const table = tablesData[currentPage].find(t => t.id === tableId);
+    if (table && table.rows.length > 1) {
+        table.rows.splice(rowIndex, 1);
+        saveData();
+        loadTables();
+    } else {
+        alert('Le tableau doit contenir au moins une ligne.');
+    }
+}
+
+// Ajouter une colonne
+function addColumn(tableId) {
+    const table = tablesData[currentPage].find(t => t.id === tableId);
+    if (table) {
+        table.rows.forEach(row => row.push(''));
+        saveData();
+        loadTables();
+    }
+}
+
+// Supprimer une colonne
+function deleteColumn(tableId, colIndex) {
+    const table = tablesData[currentPage].find(t => t.id === tableId);
+    if (table && table.rows[0].length > 1) {
+        table.rows.forEach(row => row.splice(colIndex, 1));
+        saveData();
+        loadTables();
+    } else {
+        alert('Le tableau doit contenir au moins une colonne.');
+    }
+}
+
+// Supprimer un tableau
+function deleteTable(tableId) {
+    tablesData[currentPage] = tablesData[currentPage].filter(t => t.id !== tableId);
+    saveData();
+    loadTables();
+}
+
+// Mettre à jour le titre
+function updateTableTitle(tableId, newTitle) {
+    const table = tablesData[currentPage].find(t => t.id === tableId);
+    if (table) {
+        table.title = newTitle;
+        saveData();
+    }
+}
+
+// Mettre à jour une cellule
+function updateTableCell(tableId, rowIndex, colIndex, value) {
+    const table = tablesData[currentPage].find(t => t.id === tableId);
+    if (table) {
+        table.rows[rowIndex][colIndex] = value;
+        saveData();
+    }
+}
+
+// Menu contextuel pour les tableaux
+document.addEventListener('contextmenu', function(e) {
+    const target = e.target.closest('.table-card');
+    if (target) {
+        e.preventDefault();
+        const tableId = target.id;
+        const row = e.target.closest('tr');
+        const cell = e.target.closest('td');
+        const menu = document.createElement('div');
+        menu.className = 'context-menu';
+        menu.style.left = e.pageX + 'px';
+        menu.style.top = e.pageY + 'px';
+
+        const addRowOption = document.createElement('div');
+        addRowOption.innerText = 'Ajouter une ligne';
+        addRowOption.onclick = () => addRow(tableId);
+
+        const addColumnOption = document.createElement('div');
+        addColumnOption.innerText = 'Ajouter une colonne';
+        addColumnOption.onclick = () => addColumn(tableId);
+
+        const deleteTableOption = document.createElement('div');
+        deleteTableOption.innerText = 'Supprimer le tableau';
+        deleteTableOption.onclick = () => deleteTable(tableId);
+
+        let deleteRowOption, deleteColumnOption;
+        if (row) {
+            const rowIndex = row.rowIndex;
+            deleteRowOption = document.createElement('div');
+            deleteRowOption.innerText = 'Supprimer la ligne';
+            deleteRowOption.onclick = () => deleteRow(tableId, rowIndex);
+        }
+        if (cell) {
+            const colIndex = cell.cellIndex;
+            deleteColumnOption = document.createElement('div');
+            deleteColumnOption.innerText = 'Supprimer la colonne';
+            deleteColumnOption.onclick = () => deleteColumn(tableId, colIndex);
+        }
+
+        menu.appendChild(addRowOption);
+        menu.appendChild(addColumnOption);
+        if (deleteRowOption) menu.appendChild(deleteRowOption);
+        if (deleteColumnOption) menu.appendChild(deleteColumnOption);
+        menu.appendChild(deleteTableOption);
+
+        document.body.appendChild(menu);
+        menu.style.display = 'block';
+
+        document.addEventListener('click', function closeMenu() {
+            menu.remove();
+            document.removeEventListener('click', closeMenu);
+        });
+    }
+});
+
+// Gestion des appuis longs pour les appareils tactiles
+let touchTimeout;
+document.addEventListener('touchstart', function(e) {
+    const target = e.target.closest('.table-card');
+    touchTimeout = setTimeout(() => {
+        const tableId = target ? target.id : null;
+        const row = e.target.closest('tr');
+        const cell = e.target.closest('td');
+        const menu = document.createElement('div');
+        menu.className = 'context-menu';
+        menu.style.left = e.touches[0].pageX + 'px';
+        menu.style.top = e.touches[0].pageY + 'px';
+
+        if (target) {
+            const addRowOption = document.createElement('div');
+            addRowOption.innerText = 'Ajouter une ligne';
+            addRowOption.onclick = () => addRow(tableId);
+
+            const addColumnOption = document.createElement('div');
+            addColumnOption.innerText = 'Ajouter une colonne';
+            addColumnOption.onclick = () => addColumn(tableId);
+
+            const deleteTableOption = document.createElement('div');
+            deleteTableOption.innerText = 'Supprimer le tableau';
+            deleteTableOption.onclick = () => deleteTable(tableId);
+
+            let deleteRowOption, deleteColumnOption;
+            if (row) {
+                const rowIndex = row.rowIndex;
+                deleteRowOption = document.createElement('div');
+                deleteRowOption.innerText = 'Supprimer la ligne';
+                deleteRowOption.onclick = () => deleteRow(tableId, rowIndex);
+            }
+            if (cell) {
+                const colIndex = cell.cellIndex;
+                deleteColumnOption = document.createElement('div');
+                deleteColumnOption.innerText = 'Supprimer la colonne';
+                deleteColumnOption.onclick = () => deleteColumn(tableId, colIndex);
+            }
+
+            menu.appendChild(addRowOption);
+            menu.appendChild(addColumnOption);
+            if (deleteRowOption) menu.appendChild(deleteRowOption);
+            if (deleteColumnOption) menu.appendChild(deleteColumnOption);
+            menu.appendChild(deleteTableOption);
+        }
+
+        document.body.appendChild(menu);
+        menu.style.display = 'block';
+
+        document.addEventListener('touchstart', function closeMenu() {
+            menu.remove();
+            document.removeEventListener('touchstart', closeMenu);
+        });
+    }, 500); // Appui long de 500ms
+});
+
+document.addEventListener('touchend', function() {
+    clearTimeout(touchTimeout);
+});
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    initializePage();
+});
+    </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92ff3af9886fda8b',t:'MTc0NDU5MjA1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>

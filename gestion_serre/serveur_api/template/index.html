@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Serre Connectée</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #status { margin-bottom: 20px; }
+        button { margin: 5px; padding: 10px; }
+        #loading { display: none; color: gray; }
+    </style>
+</head>
+<body>
+    <h1>État de la serre</h1>
+    <div id="status">
+        <p>Température: <span id="temperature">N/A</span> °C</p>
+        <p>Humidité: <span id="humidite">N/A</span> %</p>
+        <p>CO2: <span id="co2">N/A</span> ppm</p>
+        <p>Humidificateur: <span id="humidificateur">N/A</span></p>
+        <p>Ventilation: <span id="ventilation">N/A</span></p>
+        <p>LEDs: <span id="leds">N/A</span></p>
+        <p>Dernière mise à jour: <span id="timestamp">N/A</span></p>
+    </div>
+    <div id="loading">Chargement...</div> 
+
+
+
+
+
+    
+    <canvas id="tempChart" width="400" height="200"></canvas> 
+    
+    <script> // Graphique de température
+        const tempData = [];
+        const labels = [];
+        const ctx = document.getElementById('tempChart').getContext('2d');
+        const tempChart = new Chart(ctx, { 
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Température (°C)',
+                    data: tempData,
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            },
+            options: { scales: { y: { beginAtZero: false } } }
+        });
+
+        function updateStatus() {
+            $('#loading').show();
+            $.getJSON('/status', function(data) {
+                $('#temperature').text(data.temperature !== "N/A" ? data.temperature.toFixed(1) : 'N/A');
+                // ... (autres mises à jour)
+                $('#timestamp').text(data.timestamp);
+                if (data.temperature !== "N/A") {
+                    tempData.push(data.temperature);
+                    labels.push(data.timestamp);
+                    if (tempData.length > 40) { // Garder 10 minutes (40 x 15s)
+                        tempData.shift();
+                        labels.shift();
+                    }
+                    tempChart.update();
+                }
+                $('#loading').hide();
+            });
+        }
+    </script>
+
+
+
+
+
+
+
+    <div>
+        <button onclick="controlHumidifier(true)">Activer humidificateur</button>
+        <button onclick="controlHumidifier(false)">Désactiver humidificateur</button>
+    </div>
+    <div>
+        <button onclick="controlVentilation(true)">Activer ventilation</button>
+        <button onclick="controlVentilation(false)">Désactiver ventilation</button>
+    </div>
+    <div>
+        <button onclick="controlLeds(true)">Activer LEDs</button>
+        <button onclick="controlLeds(false)">Désactiver LEDs</button>
+    </div>
+    <div>
+        <button onclick="emergencyStop()">Arrêt d’urgence</button>
+    </div>
+    <div>
+        <button onclick="autoMode()">Retour au mode automatique</button>
+    </div>
+
+    <script>
+        // Met à jour l'affichage toutes les 15 secondes
+        
+        function updateStatus() {
+            $('#loading').show();
+            $.getJSON('/status', function(data) {
+                $('#temperature').text(data.temperature !== "N/A" ? data.temperature.toFixed(1) : 'N/A');
+                $('#humidite').text(data.humidite !== "N/A" ? data.humidite.toFixed(1) : 'N/A');
+                $('#co2').text(data.co2 !== "N/A" ? data.co2.toFixed(1) : 'N/A');
+                $('#humidificateur').text(data.humidificateur_actif ? 'Actif' : 'Désactivé');
+                $('#ventilation').text(data.ventilation_actif ? 'Actif' : 'Désactivé');
+                $('#leds').text(data.leds_actif ? 'Actives' : 'Désactivées');
+                $('#timestamp').text(data.timestamp);
+                $('#loading').hide();
+            });
+        }
+
+        // Contrôle de l'humidificateur
+        function controlHumidifier(running) {
+            $.post('/control_humidifier', { running: running }, function(data) {
+                if (data.success) {
+                    updateStatus(); // Rafraîchir immédiatement
+                }
+            });
+        }
+
+        // Contrôle de la ventilation
+        function controlVentilation(running) {
+            $.post('/control_ventilation', { running: running }, function(data) {
+                if (data.success) {
+                    updateStatus();
+                }
+            });
+        }
+
+        // Contrôle des LEDs
+        function controlLeds(running) {
+            $.post('/control_leds', { running: running }, function(data) {
+                if (data.success) {
+                    updateStatus();
+                }
+            });
+        }
+
+        // Arrêt d'urgence
+        function emergencyStop() {
+            $.post('/stop', function(data) {
+                if (data.success) {
+                    updateStatus();
+                }
+            });
+        }
+
+        // Mode automatique
+        function autoMode() {
+            $.post('/auto_mode', function(data) {
+                if (data.success) {
+                    updateStatus();
+                }
+            });
+        }
+
+        // Rafraîchir toutes les 15 secondes
+        setInterval(updateStatus, 15000);
+        // Rafraîchir immédiatement au chargement
+        updateStatus();
+    </script>
+</body>
+</html> 
