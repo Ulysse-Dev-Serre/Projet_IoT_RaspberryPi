@@ -22,42 +22,45 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        h1, h2 {
+        h1, h2, h3 {
             color: #2c3e50;
             text-align: center;
             margin-bottom: 20px;
         }
-        .status-grid, .controls-grid {
+        .status-grid, .controls-grid, .settings-grid, .current-settings-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
-        .status-item, .control-card {
+        .status-item, .control-card, .setting-card, .current-setting-item {
             background-color: #ecf0f1;
             padding: 15px;
             border-radius: 6px;
-            border-left: 5px solid #3498db;
+            border-left: 5px solid #3498db; /* Bleu par défaut */
         }
-        .control-card {
-            border-left-color: #2ecc71;
-        }
-        .status-item p, .control-card p {
+        .control-card { border-left-color: #2ecc71; /* Vert pour contrôles */ }
+        .setting-card { border-left-color: #f39c12; /* Orange pour formulaire settings */ }
+        .current-setting-item { border-left-color: #9b59b6; /* Violet pour settings actuels */ }
+
+        .status-item p, .control-card p, .setting-card p, .current-setting-item p {
             margin: 5px 0;
             font-size: 0.95em;
         }
-        .status-item strong, .control-card strong {
-            color: #2980b9;
+        .status-item strong, .control-card strong, .setting-card strong, .current-setting-item strong {
+            color: #2980b9; /* Bleu foncé pour labels */
         }
-        .control-card strong {
-            color: #27ae60;
-        }
-        .status-value {
+        .control-card strong { color: #27ae60; } /* Vert foncé */
+        .setting-card strong { color: #d35400; } /* Orange foncé */
+        .current-setting-item strong { color: #8e44ad; } /* Violet foncé */
+
+        .status-value, .setting-value {
             font-weight: bold;
             color: #333;
         }
         .on { color: #27ae60; font-weight: bold; }
         .off { color: #c0392b; font-weight: bold; }
+        
         button {
             background-color: #3498db;
             color: white;
@@ -75,47 +78,57 @@
         button:hover {
             background-color: #2980b9;
         }
-        button.danger {
-            background-color: #e74c3c;
-        }
-        button.danger:hover {
-            background-color: #c0392b;
-        }
-        button.secondary {
-            background-color: #95a5a6;
-        }
-        button.secondary:hover {
-            background-color: #7f8c8d;
-        }
+        button.danger { background-color: #e74c3c; }
+        button.danger:hover { background-color: #c0392b; }
+        button.secondary { background-color: #95a5a6; }
+        button.secondary:hover { background-color: #7f8c8d; }
+        button.save-settings { background-color: #f39c12; } /* Orange pour sauvegarder settings */
+        button.save-settings:hover { background-color: #e67e22; }
+
+
         .button-group {
             margin-top: 10px;
             display: flex;
             gap: 10px;
             justify-content: center;
         }
-        /* L'élément #loading-status n'est plus utilisé pour afficher/masquer, 
-           mais on pourrait le styler différemment si on voulait un message permanent.
-           Pour l'instant, on le commente ou on le supprime du HTML si non désiré.
-        #loading-status {
-            text-align: center;
-            padding: 10px;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-        */
         .timestamp {
             text-align: center;
             font-size: 0.9em;
             color: #7f8c8d;
             margin-bottom: 20px;
-            min-height: 1.2em; /* Pour éviter un léger saut si le texte change de longueur */
+            min-height: 1.2em; 
         }
+        .setting-card label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        .setting-card input[type="number"], .setting-card input[type="text"] {
+            width: calc(100% - 22px); /* Ajuster pour padding et bordure */
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #bdc3c7;
+            box-sizing: border-box;
+        }
+        #settings-feedback {
+            text-align: center;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .feedback-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+        .feedback-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Tableau de Bord de la Serre Connectée</h1>
-        <p class="timestamp">Dernière mise à jour: <span id="timestamp-value">Chargement initial...</span></p>
+        <p class="timestamp">Dernière mise à jour des capteurs: <span id="timestamp-value">Chargement initial...</span></p>
+        
         <h2>État Actuel des Capteurs</h2>
         <div class="status-grid">
             <div class="status-item">
@@ -144,7 +157,6 @@
                     <button onclick="controlDevice('leds', 'off')">Éteindre</button>
                 </div>
             </div>
-
             <div class="control-card" id="humidifier-card">
                 <p><strong>Humidificateur:</strong> <span id="humidifier_is_active" class="status-value off">N/A</span></p>
                 <p>Mode: <span id="humidifier_manual_mode">N/A</span></p>
@@ -155,7 +167,6 @@
                     <button onclick="controlDevice('humidifier', 'off')">Désactiver</button>
                 </div>
             </div>
-
             <div class="control-card" id="ventilation-card">
                 <p><strong>Ventilation:</strong> <span id="ventilation_is_active" class="status-value off">N/A</span></p>
                 <p>Mode: <span id="ventilation_manual_mode">N/A</span></p>
@@ -174,14 +185,176 @@
             <button class="danger" onclick="emergencyStop()">Arrêt d'Urgence Global</button>
         </div>
 
+        <h3>Configurations Actuelles de la Serre</h3>
+        <div class="current-settings-grid" id="current-settings-display">
+            <p>Chargement des configurations...</p>
+        </div>
+
+        <h3>Modifier les Configurations</h3>
+        <div class="settings-grid">
+            <div class="setting-card">
+                <label for="setting_HEURE_DEBUT_LEDS">Heure Début LEDs (0-23):</label>
+                <input type="number" id="setting_HEURE_DEBUT_LEDS" min="0" max="23" placeholder="Ex: 8">
+                
+                <label for="setting_HEURE_FIN_LEDS">Heure Fin LEDs (0-23):</label>
+                <input type="number" id="setting_HEURE_FIN_LEDS" min="0" max="23" placeholder="Ex: 20">
+            </div>
+            <div class="setting-card">
+                <label for="setting_SEUIL_HUMIDITE_ON">Seuil Humidité ON (%):</label>
+                <input type="number" id="setting_SEUIL_HUMIDITE_ON" step="0.1" placeholder="Ex: 75.0">
+
+                <label for="setting_SEUIL_HUMIDITE_OFF">Seuil Humidité OFF (%):</label>
+                <input type="number" id="setting_SEUIL_HUMIDITE_OFF" step="0.1" placeholder="Ex: 84.9">
+            </div>
+            <div class="setting-card">
+                <label for="setting_SEUIL_CO2_MAX">Seuil CO₂ Max (ppm):</label>
+                <input type="number" id="setting_SEUIL_CO2_MAX" step="1" placeholder="Ex: 1200">
+            </div>
+            <div class="setting-card">
+                <label for="setting_HEURE_DEBUT_JOUR_OPERATION">Heure Début Opération Jour (0-23):</label>
+                <input type="number" id="setting_HEURE_DEBUT_JOUR_OPERATION" min="0" max="23" placeholder="Ex: 8">
+                
+                <label for="setting_HEURE_FIN_JOUR_OPERATION">Heure Fin Opération Jour (0-23):</label>
+                <input type="number" id="setting_HEURE_FIN_JOUR_OPERATION" min="0" max="23" placeholder="Ex: 22">
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="save-settings" onclick="saveSettings()">Sauvegarder les Configurations</button>
+        </div>
+        <div id="settings-feedback" style="display:none;"></div>
+
     </div>
 
     <script>
-        // Fonction pour mettre à jour l'état d'un appareil (LEDs, Humidificateur, Ventilation)
+        // Clés de configuration attendues (correspondent à DEFAULT_SETTINGS dans config.py)
+        const settingKeys = [
+            "HEURE_DEBUT_LEDS", "HEURE_FIN_LEDS",
+            "SEUIL_HUMIDITE_ON", "SEUIL_HUMIDITE_OFF",
+            "SEUIL_CO2_MAX",
+            "HEURE_DEBUT_JOUR_OPERATION", "HEURE_FIN_JOUR_OPERATION"
+        ];
+
+        // Fonction pour afficher les configurations actuelles
+        function displayCurrentSettings(settings) {
+            const displayDiv = $('#current-settings-display');
+            displayDiv.empty(); // Vider l'ancien contenu
+
+            if ($.isEmptyObject(settings)) {
+                displayDiv.append('<p>Aucune configuration à afficher.</p>');
+                return;
+            }
+
+            settingKeys.forEach(key => {
+                if (settings.hasOwnProperty(key)) {
+                    const itemDiv = $('<div class="current-setting-item"></div>');
+                    itemDiv.append(`<p><strong>${key.replace(/_/g, ' ')}:</strong> <span class="setting-value">${settings[key]}</span></p>`);
+                    displayDiv.append(itemDiv);
+                }
+            });
+        }
+
+        // Fonction pour charger et afficher les configurations actuelles et remplir le formulaire
+        function loadAndPopulateSettings() {
+            $.getJSON('/api/settings', function(settings) {
+                displayCurrentSettings(settings); // Afficher les configurations actuelles
+
+                // Remplir les champs du formulaire
+                settingKeys.forEach(key => {
+                    if (settings.hasOwnProperty(key)) {
+                        $(`#setting_${key}`).val(settings[key]);
+                    }
+                });
+                $('#settings-feedback').hide(); // Cacher les messages précédents
+            }).fail(function() {
+                console.error("Erreur lors du chargement des configurations.");
+                $('#current-settings-display').html('<p>Erreur lors du chargement des configurations.</p>');
+                $('#settings-feedback').text('Erreur de chargement des configurations.').removeClass('feedback-success').addClass('feedback-error').show();
+            });
+        }
+
+        // Fonction pour sauvegarder les configurations modifiées
+        function saveSettings() {
+            const newSettings = {};
+            let allFieldsValid = true;
+
+            settingKeys.forEach(key => {
+                const inputElement = $(`#setting_${key}`);
+                let value = inputElement.val();
+                
+                // Validation simple (peut être étendue)
+                if (value === '') {
+                    // Permettre des champs vides si cela a un sens (ex: pour utiliser le défaut du serveur)
+                    // ou forcer une valeur. Pour l'instant, on envoie la chaîne vide si l'utilisateur l'efface.
+                    // Si une valeur est requise, ajouter une validation ici.
+                    // newSettings[key] = null; // Ou une valeur par défaut si le champ vide n'est pas permis
+                } else {
+                     // Tenter de convertir en nombre si c'est un input de type number ou si la clé suggère un nombre
+                    if (inputElement.attr('type') === 'number' || key.includes('SEUIL') || key.includes('HEURE')) {
+                        const numValue = parseFloat(value);
+                        if (isNaN(numValue)) {
+                            // Gérer l'erreur si ce n'est pas un nombre valide, mais pour l'instant on envoie la chaîne
+                            // pour que le backend valide et potentiellement caste.
+                            // Pour une meilleure UX, valider ici et afficher un message.
+                            console.warn(`Valeur non numérique pour ${key}: ${value}`);
+                            // allFieldsValid = false; // Décommenter pour bloquer l'envoi si non numérique
+                        }
+                        newSettings[key] = value; // Envoyer la valeur telle quelle, le backend gérera le cast
+                    } else {
+                        newSettings[key] = value;
+                    }
+                }
+            });
+
+            // if (!allFieldsValid) {
+            //     showSettingsFeedback('Veuillez corriger les erreurs dans les champs.', false);
+            //     return;
+            // }
+
+            $('#settings-feedback').text('Sauvegarde en cours...').removeClass('feedback-success feedback-error').show();
+
+            $.ajax({
+                url: '/api/settings',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(newSettings),
+                success: function(response) {
+                    if (response.success) {
+                        showSettingsFeedback(response.message || 'Configurations sauvegardées avec succès!', true);
+                        loadAndPopulateSettings(); // Recharger pour afficher les valeurs mises à jour
+                    } else {
+                        showSettingsFeedback(response.message || 'Erreur lors de la sauvegarde.', false);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("Erreur AJAX pour /api/settings POST:", textStatus, errorThrown);
+                    let errorMsg = 'Erreur serveur lors de la sauvegarde des configurations.';
+                    if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                        errorMsg = jqXHR.responseJSON.message;
+                    }
+                    showSettingsFeedback(errorMsg, false);
+                }
+            });
+        }
+
+        function showSettingsFeedback(message, isSuccess) {
+            const feedbackDiv = $('#settings-feedback');
+            feedbackDiv.text(message);
+            if (isSuccess) {
+                feedbackDiv.removeClass('feedback-error').addClass('feedback-success');
+            } else {
+                feedbackDiv.removeClass('feedback-success').addClass('feedback-error');
+            }
+            feedbackDiv.show();
+            // Optionnel: cacher après quelques secondes
+            // setTimeout(() => { feedbackDiv.hide(); }, 5000);
+        }
+
+
+        // Fonctions existantes pour l'état des capteurs et le contrôle des actionneurs
         function updateDeviceStatus(deviceData, deviceName) {
             const isActiveElement = $(`#${deviceName}_is_active`);
             const newStatusText = deviceData.is_active ? 'ACTIF' : 'INACTIF';
-            if (isActiveElement.text() !== newStatusText) { // Mettre à jour seulement si le texte change
+            if (isActiveElement.text() !== newStatusText) { 
                 isActiveElement.text(newStatusText);
                 isActiveElement.removeClass('on off').addClass(deviceData.is_active ? 'on' : 'off');
             }
@@ -191,14 +364,13 @@
             $(`#${deviceName}_off_duration`).text(deviceData.off_duration_seconds.toFixed(1));
         }
 
-        // Fonction pour mettre à jour l'affichage du statut global
         function updateStatusDisplay() {
             const timestampValueElement = $('#timestamp-value');
-            const originalTimestampText = timestampValueElement.text(); // Sauvegarder le texte actuel du timestamp
-            timestampValueElement.text('Mise à jour...'); // Indiquer le chargement
+            const originalTimestampText = timestampValueElement.text(); 
+            timestampValueElement.text('Mise à jour des capteurs...'); 
 
             $.getJSON('/status', function(data) {
-                timestampValueElement.text(data.timestamp || 'N/A'); // Restaurer avec la nouvelle valeur
+                timestampValueElement.text(data.timestamp || 'N/A'); 
                 
                 $('#temperature').text(data.temperature !== "N/A" ? parseFloat(data.temperature).toFixed(1) : 'N/A');
                 $('#humidite').text(data.humidite !== "N/A" ? parseFloat(data.humidite).toFixed(1) : 'N/A');
@@ -211,78 +383,74 @@
                     sensorOkElement.removeClass('on off').addClass(data.sensor_read_ok ? 'on' : 'off');
                 }
 
-
-                if (data.leds) {
-                    updateDeviceStatus(data.leds, 'leds');
-                }
-                if (data.humidifier) {
-                    updateDeviceStatus(data.humidifier, 'humidifier');
-                }
-                if (data.ventilation) {
-                    updateDeviceStatus(data.ventilation, 'ventilation');
-                }
+                if (data.leds) updateDeviceStatus(data.leds, 'leds');
+                if (data.humidifier) updateDeviceStatus(data.humidifier, 'humidifier');
+                if (data.ventilation) updateDeviceStatus(data.ventilation, 'ventilation');
                 
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                timestampValueElement.text(originalTimestampText); // Restaurer l'ancien timestamp en cas d'erreur
-                // Optionnel: afficher un message d'erreur plus persistant ailleurs
+                timestampValueElement.text(originalTimestampText); 
                 console.error("Erreur AJAX pour /status:", textStatus, errorThrown);
-                // Vous pourriez ajouter un petit message d'erreur discret à côté du timestamp
-                // $('#timestamp-error').text('Erreur de chargement.').show().delay(3000).fadeOut();
             });
         }
 
-        // Fonction générique pour contrôler un appareil
         function controlDevice(deviceName, action) {
-            const timestampValueElement = $('#timestamp-value');
-            timestampValueElement.text(`Contrôle de ${deviceName}...`);
+            const feedbackDiv = $('#settings-feedback'); // Utiliser le même div pour feedback
+            feedbackDiv.text(`Contrôle de ${deviceName}...`).removeClass('feedback-success feedback-error').show();
 
             $.post(`/control/${deviceName}`, { action: action }, function(response) {
                 if (response.success) {
+                    feedbackDiv.text(response.message || `Contrôle de ${deviceName} réussi.`).addClass('feedback-success').show();
                     updateStatusDisplay(); 
                 } else {
-                    alert(`Erreur lors du contrôle de ${deviceName}: ${response.message}`);
-                    updateStatusDisplay(); // Mettre à jour même en cas d'erreur pour refléter l'état actuel
+                    feedbackDiv.text(response.message || `Erreur lors du contrôle de ${deviceName}.`).addClass('feedback-error').show();
+                    updateStatusDisplay(); 
                 }
+                 setTimeout(() => { feedbackDiv.hide(); }, 4000);
             }).fail(function() {
-                alert(`Erreur de communication serveur pour contrôler ${deviceName}.`);
-                updateStatusDisplay(); // Mettre à jour pour refléter l'état actuel
+                feedbackDiv.text(`Erreur de communication serveur pour contrôler ${deviceName}.`).addClass('feedback-error').show();
+                updateStatusDisplay(); 
+                 setTimeout(() => { feedbackDiv.hide(); }, 4000);
             });
         }
 
-        // Fonction pour passer tous les appareils en mode automatique
         function setGlobalAutoMode() {
-            const timestampValueElement = $('#timestamp-value');
-            timestampValueElement.text('Passage en mode automatique...');
+            const feedbackDiv = $('#settings-feedback');
+            feedbackDiv.text('Passage en mode automatique...').removeClass('feedback-success feedback-error').show();
             $.post('/control/auto_mode', function(response) {
                 if (response.success) {
+                    feedbackDiv.text(response.message || 'Mode automatique global activé.').addClass('feedback-success').show();
                     updateStatusDisplay();
                 } else {
-                    alert(`Erreur lors du passage en mode auto: ${response.message}`);
+                    feedbackDiv.text(response.message || 'Erreur lors du passage en mode auto.').addClass('feedback-error').show();
                     updateStatusDisplay();
                 }
+                 setTimeout(() => { feedbackDiv.hide(); }, 4000);
             }).fail(function() {
-                alert('Erreur de communication serveur pour le mode automatique.');
+                feedbackDiv.text('Erreur de communication serveur pour le mode automatique.').addClass('feedback-error').show();
                 updateStatusDisplay();
+                 setTimeout(() => { feedbackDiv.hide(); }, 4000);
             });
         }
 
-        // Fonction pour l'arrêt d'urgence
         function emergencyStop() {
             if (!confirm("Êtes-vous sûr de vouloir effectuer un arrêt d'urgence ? Tous les appareils seront désactivés.")) {
                 return;
             }
-            const timestampValueElement = $('#timestamp-value');
-            timestampValueElement.text("Arrêt d'urgence en cours...");
+            const feedbackDiv = $('#settings-feedback');
+            feedbackDiv.text("Arrêt d'urgence en cours...").removeClass('feedback-success feedback-error').show();
             $.post('/control/emergency_stop', function(response) {
                 if (response.success) {
+                    feedbackDiv.text(response.message || "Arrêt d'urgence effectué.").addClass('feedback-success').show();
                     updateStatusDisplay();
                 } else {
-                    alert(`Erreur lors de l'arrêt d'urgence: ${response.message}`);
+                    feedbackDiv.text(response.message || "Erreur lors de l'arrêt d'urgence.").addClass('feedback-error').show();
                     updateStatusDisplay();
                 }
+                 setTimeout(() => { feedbackDiv.hide(); }, 4000);
             }).fail(function() {
-                alert("Erreur de communication serveur pour l'arrêt d'urgence.");
+                feedbackDiv.text("Erreur de communication serveur pour l'arrêt d'urgence.").addClass('feedback-error').show();
                 updateStatusDisplay();
+                 setTimeout(() => { feedbackDiv.hide(); }, 4000);
             });
         }
 
@@ -290,11 +458,13 @@
         setInterval(updateStatusDisplay, refreshIntervalSeconds * 1000);
 
         $(document).ready(function() {
-            updateStatusDisplay();
+            updateStatusDisplay(); // Charger l'état des capteurs/actionneurs
+            loadAndPopulateSettings(); // Charger les configurations de la serre
         });
     </script>
 </body>
 </html>
+
 
 
 
