@@ -48,7 +48,7 @@ FLUSH_INTERVAL_BUFFER_SECONDES = 300  # Vidage du buffer toutes les 5 minutes
 BUFFER_SIZE_MAX = 10  # Nombre d'enregistrements avant vidage forcé du buffer
 
 # Configuration du logging
-LOG_FILE_PATH = 'serre_controller.log' # Chemin vers le fichier de log
+LOG_FILE_PATH = 'data/logs/serre_controller.log' # Chemin vers le fichier de log
 LOG_LEVEL = 'INFO' # Niveaux: DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 # Broches GPIO (si utilisées directement ici, sinon elles sont dans raspberry_pi.py)

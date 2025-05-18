@@ -55,6 +55,17 @@ root_logger.addHandler(console_handler)
 # Handler pour le fichier
 try:
     log_file_path = config.LOG_FILE_PATH
+
+    # --- DÉBUT DE L'AJOUT ---
+    # Obtenir le répertoire du fichier journal
+    log_directory = os.path.dirname(log_file_path)
+    # Si le chemin contient un répertoire (n'est pas juste un nom de fichier)
+    # et que ce répertoire n'existe pas, le créer.
+    if log_directory and not os.path.exists(log_directory):
+        os.makedirs(log_directory)
+        print(f"Répertoire de logs créé : {log_directory}")
+    # --- FIN DE L'AJOUT ---
+
     file_handler = logging.FileHandler(log_file_path, mode='a') # 'a' pour append
     file_handler.setFormatter(log_formatter)
     # file_handler.setLevel(log_level) # Optionnel
