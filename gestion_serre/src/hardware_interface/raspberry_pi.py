@@ -21,6 +21,9 @@ except ImportError as e:
     class adafruit_scd30: pass
 
 
+    
+
+
 # Configuration des broches GPIO
 LEDS_PIN = 27
 VENTILATION_PIN = 22

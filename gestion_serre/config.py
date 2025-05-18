@@ -51,12 +51,6 @@ BUFFER_SIZE_MAX = 10  # Nombre d'enregistrements avant vidage forcé du buffer
 LOG_FILE_PATH = 'data/logs/serre_controller.log' # Chemin vers le fichier de log
 LOG_LEVEL = 'INFO' # Niveaux: DEBUG, INFO, WARNING, ERROR, CRITICAL
 
-# Broches GPIO (si utilisées directement ici, sinon elles sont dans raspberry_pi.py)
-# Il est préférable de les garder dans le module matériel spécifique.
-# LEDS_PIN = 27
-# VENTILATION_PIN = 22
-# FAN_HUMIDI_PIN = 26
-# BRUMISATEUR_PIN = 13
 
 # Autres configurations spécifiques à l'application
 APP_HOST = '0.0.0.0'
