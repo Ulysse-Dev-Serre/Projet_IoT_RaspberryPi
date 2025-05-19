@@ -13,7 +13,7 @@ try:
     # On importe directement l'implémentation RaspberryPiHardware
     # Ce script est destiné à être exécuté UNIQUEMENT sur le Raspberry Pi.
     from src.hardware_interface.raspberry_pi import RaspberryPiHardware, RASPBERRY_PI_LIBS_AVAILABLE
-    # import config # Pas strictement nécessaire ici car on force RaspberryPiHardware
+    # from src import config # Pas strictement nécessaire ici car on force RaspberryPiHardware
 except ImportError as e:
     print(f"ERREUR: Impossible d'importer les modules nécessaires: {e}")
     print("Assurez-vous que ce script est dans le répertoire racine du projet et que la structure est correcte.")

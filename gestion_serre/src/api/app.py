@@ -14,7 +14,7 @@ if project_root not in sys.path:
 try:
     from flask import Flask, jsonify, render_template, request
     from src.core.serre_logic import SerreController
-    import config 
+    from src import config 
 except ImportError as e:
     print(f"Erreur d'importation critique dans app.py: {e}.")
     sys.exit(1)

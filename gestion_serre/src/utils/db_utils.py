@@ -8,7 +8,7 @@ from datetime import datetime
 # Essayer d'importer les configurations spécifiques.
 # Si cela échoue, des valeurs par défaut locales à ce module seront utilisées.
 try:
-    from config import ACTIVE_DB_CONFIG, BUFFER_SIZE_MAX, FLUSH_INTERVAL_BUFFER_SECONDES
+    from src.config import ACTIVE_DB_CONFIG, BUFFER_SIZE_MAX, FLUSH_INTERVAL_BUFFER_SECONDES
     # Si l'import réussit, ces variables sont disponibles globalement dans ce module.
     # Et ACTIVE_DB_CONFIG devrait être un dictionnaire.
 except ImportError:

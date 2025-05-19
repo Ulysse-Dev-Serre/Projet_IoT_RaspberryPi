@@ -15,7 +15,7 @@ if project_root not in sys.path:
 
 try:
     from src.core.serre_logic import SerreController
-    import config # S'assure que config.py est accessible et chargé
+    from src import config # S'assure que config.py est accessible et chargé
 except ImportError as e:
     # Utiliser print ici car le logging n'est peut-être pas encore configuré
     print(f"ERREUR CRITIQUE: Impossible d'importer les modules nécessaires: {e}")

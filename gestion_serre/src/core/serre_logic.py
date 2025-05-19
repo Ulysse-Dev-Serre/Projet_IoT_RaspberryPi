@@ -8,7 +8,7 @@ from datetime import datetime
 import importlib
 
 # Importer le module config (qui contient DEFAULT_SETTINGS et USER_SETTINGS_FILE)
-import config 
+from src import config 
 
 from .actuators.led_controller import LedController
 from .actuators.humidifier_controller import HumidifierController
