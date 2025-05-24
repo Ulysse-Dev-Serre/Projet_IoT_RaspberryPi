@@ -12,7 +12,7 @@ PROJECT_ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # --- Configuration de l'Environnement ---
 HARDWARE_ENV = os.getenv('HARDWARE_ENV', 'raspberry_pi') # Défaut à 'raspberry_pi'
-DB_ENV = os.getenv('DB_ENV', 'test')
+DB_ENV = os.getenv('DB_ENV', 'prod')
 
 # --- Configurations de la Base de Données ---
 DB_CONFIG_PROD = {
