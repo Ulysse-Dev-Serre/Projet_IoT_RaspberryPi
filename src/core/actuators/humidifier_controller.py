@@ -13,7 +13,7 @@ class HumidifierController(BaseActuator):
     def __init__(self, hardware_interface, controller_instance):
         super().__init__(hardware_interface, "humidifier")
         self.controller = controller_instance
-        self.last_special_session_done_today = False
+        
 
     def _get_desired_automatic_state(self, current_sensor_data: dict) -> bool:
         """
@@ -79,22 +79,12 @@ class HumidifierController(BaseActuator):
         if not in_operation_window:
             return False
 
-        # Logique de la session spéciale (exemple fixe, pourrait être rendue configurable)
-        if heure_actuelle >= heure_debut_operation and self.last_special_session_done_today:
-             self.last_special_session_done_today = False
-             logging.info("HumidifierController: Réinitialisation du flag de session spéciale d'humidification.")
-        
-        is_special_session_time = (heure_actuelle == 21 and 30 <= now.minute < 35)
-        if is_special_session_time and not self.last_special_session_done_today:
-            logging.info("HumidifierController: En session spéciale d'humidification. Activation.")
-            return True
+
         
         if humidite < seuil_humidite_on:
             return True
         elif humidite >= seuil_humidite_off:
-            if (heure_actuelle == 21 and now.minute >= 35) and not self.last_special_session_done_today:
-                self.last_special_session_done_today = True
-                logging.info("HumidifierController: Session spéciale d'humidification marquée comme terminée (extinction après).")
+           
             return False
         else:
             return self.current_state

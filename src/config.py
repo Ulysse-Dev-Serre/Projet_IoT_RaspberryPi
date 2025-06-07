@@ -77,8 +77,8 @@ DEFAULT_SETTINGS = {
     KEY_SEUIL_HUMIDITE_ON: 75.0,
     KEY_SEUIL_HUMIDITE_OFF: 84.9,
     KEY_SEUIL_CO2_MAX: 1200.0,
-    KEY_HEURE_DEBUT_JOUR_OPERATION: 8, # Heure de début générale des opérations (ex: humidificateur, ventilation)
-    KEY_HEURE_FIN_JOUR_OPERATION: 22,   # Heure de fin générale des opérations
+    KEY_HEURE_DEBUT_JOUR_OPERATION: 0, # Heure de début générale des opérations (ex: humidificateur, ventilation)
+    KEY_HEURE_FIN_JOUR_OPERATION: 24,   # Heure de fin générale des opérations
 
     # Valeurs par défaut pour les broches (numérotation BCM pour Raspberry Pi)
     KEY_PIN_LEDS: 27,
