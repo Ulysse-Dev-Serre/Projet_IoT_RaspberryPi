@@ -16,7 +16,7 @@ Ce projet est le système de contrôle backend pour une serre à champignons aut
 
 ## Prérequis
 
-* Python 3.9+
+* Python 3.9++
 * Raspberry Pi (pour le déploiement avec matériel réel, testé sur Raspberry Pi OS)
 * Capteur SCD30 (pour température, humidité, CO2)
 * Relais pour contrôler les actionneurs (LEDs, ventilateur, brumisateur)
