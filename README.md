@@ -1,3 +1,221 @@
+[English](#english) | [Français](#francais)
+
+<a id="english"></a>
+
+# 🍄 Smart Mushroom Greenhouse - Raspberry Pi IoT Project
+
+An automated control system for a mushroom greenhouse, powered by Raspberry Pi.
+
+---
+
+## 🎯 Project Vision
+
+This project explores the **Internet of Things (IoT)** in agriculture, combining food self-sufficiency with technological innovation. Designed as a smart management system for a mushroom greenhouse, it provides automated environmental control (temperature, humidity, CO2) through connected sensors and actuators.
+
+Beyond greenhouse control, this project serves as an **experimentation platform** for developing skills in several areas:
+
+- Frontend applications (Electron desktop, Flutter mobile)
+- Artificial intelligence (video analysis, voice assistant)
+- Optimization through data analysis
+- Modern software architecture (SOLID, microservices)
+
+---
+
+## ✨ Features
+
+### Automated Control
+
+- 📊 **Real-time monitoring**: Temperature, humidity, CO2 (SCD30 sensor)
+- 💡 **Smart lighting**: LEDs with configurable schedules
+- 💧 **Humidity management**: Humidifier with configurable thresholds
+- 🌬️ **Adaptive ventilation**: Automatic exhaust based on CO2 levels
+
+### Control Modes
+
+- 🤖 **Automatic mode**: Autonomous management based on configured settings
+- 🎮 **Manual mode**: Direct control through the CLI menu or API
+- 🔌 **Simulation**: Mock mode for development without hardware
+
+### Full REST API
+
+- 🌐 **FastAPI**: Modern API with built-in Swagger documentation
+- 🔐 **Authentication**: API key authentication (X-API-Key)
+- 📱 **Cross-platform**: Compatible with Electron, Flutter, React, Vue, etc.
+- 📈 **Historical data**: Data export for analysis
+
+---
+
+## 🏗️ Architecture
+
+```text
+Backend (Raspberry Pi)
+├── Sensors → SensorService → Orchestrator → ActuatorCoordinator → Actuators
+├── Configuration → ConfigurationManager → user_settings.json
+├── Data → DataPersistence → SQLite
+└── REST API → FastAPI (monitoring + control)
+```
+
+**SOLID principles**: A modular architecture with specialized services to make maintenance and future development easier.
+
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Clone the project
+git clone https://github.com/Ulysse-Dev-Serre/Projet_IoT_RaspberryPi.git
+cd Projet_IoT_RaspberryPi
+
+# Create and activate a virtual environment
+python3 -m venv myenv
+source myenv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Running the Application
+
+```bash
+# Simulation mode (no hardware required)
+export HARDWARE_ENV=mock
+python main.py
+
+# Hardware mode (with connected devices)
+export HARDWARE_ENV=raspberry_pi
+export API_KEY="your-secret-key"
+python main.py
+```
+
+The API documentation will be available at: `http://<RASPBERRY_PI_IP>:5000/docs`
+
+📖 **Full setup guide**: [docs/1-fundation/SETUP.md](docs/1-fundation/SETUP.md)
+
+---
+
+## 📚 Documentation
+
+The detailed documentation linked below is in French.
+
+### Getting Started
+
+- **[docs/1-fundation/SETUP.md](docs/1-fundation/SETUP.md)** - Step-by-step installation
+- **[docs/1-fundation/ARCHITECTURE.md](docs/1-fundation/ARCHITECTURE.md)** - Code structure
+- **[docs/1-fundation/HARDWARE.md](docs/1-fundation/HARDWARE.md)** - Hardware configuration
+
+### Development
+
+- **[docs/FRONTEND_CONNECT.md](docs/FRONTEND_CONNECT.md)** - ⭐ Connect a frontend application
+- **[docs/2-logic/CORE_LOGIC.md](docs/2-logic/CORE_LOGIC.md)** - Business logic
+- **[docs/3-api/API_GUIDE.md](docs/3-api/API_GUIDE.md)** - REST API
+
+### Reference
+
+- **[docs/1-fundation/COMMANDES_UTILES.md](docs/1-fundation/COMMANDES_UTILES.md)** - Command reference
+- **[docs/INDEX.md](docs/INDEX.md)** - Full documentation index
+
+---
+
+## 🧪 Tests
+
+```bash
+# API tests (9 automated tests)
+python scripts/test_api_simple.py
+
+# Unit tests
+pytest
+
+# Hardware test
+python scripts/hardware_test_menu.py
+```
+
+---
+
+## 🛠️ Technology Stack
+
+**Backend**:
+
+- Python 3.9+
+- FastAPI (REST API)
+- SQLite (database)
+- lgpio (GPIO control)
+
+**Hardware**:
+
+- Raspberry Pi 5
+- SCD30 sensor (I2C)
+- 4-channel relay module
+- LEDs, fan, ultrasonic humidifier
+
+**Architecture**:
+
+- SOLID principles
+- Observer pattern (sensors → orchestrator)
+- Dependency injection (orchestrator → API)
+- Thread safety (locks for concurrent control)
+
+---
+
+## 🚀 Future Improvements
+
+- [ ] WebSocket for real-time updates (replacing polling)
+- [ ] React/Vue web interface
+- [ ] Flutter mobile application
+- [ ] Electron desktop application
+- [ ] AI video analysis (mushroom growth detection)
+- [ ] Voice assistant (status, control)
+- [ ] Machine learning (environmental optimization)
+- [ ] Analytics dashboard with charts
+- [ ] CSV/PDF data export
+- [ ] Push notifications (alerts)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the project
+2. Create a branch (`git checkout -b feature/improvement`)
+3. Commit your changes (`git commit -m 'Add feature X'`)
+4. Push to the branch (`git push origin feature/improvement`)
+5. Open a pull request
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE.md).
+
+---
+
+## 👤 Author
+
+Developed by **Ulysse** as part of studies in systems development.
+
+A project combining a passion for food self-sufficiency and technological innovation.
+
+---
+
+## 🔗 Useful Links
+
+- **Full documentation**: [docs/INDEX.md](docs/INDEX.md)
+- **Frontend guide**: [docs/FRONTEND_CONNECT.md](docs/FRONTEND_CONNECT.md)
+- **Swagger API documentation**: `http://<RASPBERRY_PI_IP>:5000/docs`
+- **Repository**: [GitHub](https://github.com/Ulysse-Dev-Serre/Projet_IoT_RaspberryPi)
+
+---
+
+⭐ **Star this project** if you find it useful!
+
+---
+
+<a id="francais"></a>
+
+[↑ English](#english)
+
 # 🍄 Serre Connectée - Projet IoT Raspberry Pi
 
 Système de contrôle automatisé pour serre à champignons, propulsé par Raspberry Pi.
